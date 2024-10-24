@@ -17,6 +17,8 @@ app.use(cookieParser());
  const userRoutes = require('./routes/userRoutes');
  const teamRoutes = require('./routes/teamRoutes');
  const taskRoutes = require('./routes/taskRoutes');
+ const inviteRoutes = require('./routes/inviteRoutes');
+
 
 
 const corsOptions = {
@@ -32,10 +34,15 @@ connectDB();
 app.use(express.urlencoded({ extended: true })); // For form-data
 app.use(express.json());
 
+const isAuthenticated = passport.authenticate('jwt', {session: false});
+ 
+
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/invite', isAuthenticated, inviteRoutes);
+
 
 // Start the server
 const PORT = process.env.PORT || 5000;

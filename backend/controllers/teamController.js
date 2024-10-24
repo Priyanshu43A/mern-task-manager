@@ -1,6 +1,8 @@
 const mongoose = require('mongoose'); 
 const Team = require('../models/Team');
 const User = require('../models/User'); // Import the User model
+const Invite = require("../models/InviteSchema");
+const { generateInvite } = require("../utils/generateInviteLink");
 const sendResponse = require('../utils/sendResponse'); // Import the sendResponse utility
 
 const createTeam = async (req, res) => {
@@ -181,8 +183,6 @@ const removeEmployees = async (req, res) => {
     }
 };
 
-
-
 const getTeamDetails = async (req, res) => {
    try {
     const {teamId} = req.params;
@@ -262,4 +262,20 @@ const acceptInvite = async (req, res) => {
     }
 };
 
-module.exports = { createTeam, addEmployees, getTeamDetails, acceptInvite, removeEmployees };
+const generateLink = async (req, res) => {
+    try {
+       const { teamId } = req.body; // Assuming the team ID is sent in the request body
+       const userId = req.user.id;  // The user creating the invite (must be logged in)
+ 
+       // Call the function to generate the invite link
+       const inviteLink = await generateInvite(teamId, userId);
+ 
+       // Send the invite link as the response
+       sendResponse(res, 200, true, "Invitation link generated successfully !", { inviteLink });
+ 
+    } catch (error) { 
+        sendResponse(res, 500, false, "Error generating invitation link !", null ,{ error: error.message });
+    }
+ }
+
+module.exports = { createTeam, addEmployees, getTeamDetails, acceptInvite, removeEmployees, generateLink };
